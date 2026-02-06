@@ -300,15 +300,10 @@ static id<SDImageLoader> _defaultImageLoader;
     // Check whether we should query cache
     BOOL shouldQueryCache = !SD_OPTIONS_CONTAINS(options, SDWebImageFromLoaderOnly);
     if (shouldQueryCache) {
-        // transformed cache key
+        // maybe thumbnail/transformed cache key
         NSString *key = [self cacheKeyForURL:url context:context];
-        // to avoid the SDImageCache's sync logic use the mismatched cache key
-        // we should strip the `thumbnail` related context
-        SDWebImageMutableContext *mutableContext = [context mutableCopy];
-        mutableContext[SDWebImageContextImageThumbnailPixelSize] = nil;
-        mutableContext[SDWebImageContextImagePreserveAspectRatio] = nil;
         @weakify(operation);
-        id<SDWebImageOperation> cacheOperation = [imageCache queryImageForKey:key options:options context:mutableContext cacheType:queryCacheType completion:^(UIImage * _Nullable cachedImage, NSData * _Nullable cachedData, SDImageCacheType cacheType) {
+        id<SDWebImageOperation> cacheOperation = [imageCache queryImageForKey:key options:options context:context cacheType:queryCacheType completion:^(UIImage * _Nullable cachedImage, NSData * _Nullable cachedData, SDImageCacheType cacheType) {
             @strongify(operation);
             if (!operation || operation.isCancelled) {
                 // Image combined operation cancelled by user
